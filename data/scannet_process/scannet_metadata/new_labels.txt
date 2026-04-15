@@ -1,0 +1,46 @@
+41 stool
+42 backpack
+43 trash can
+44 ceiling light
+45 computer tower
+46 heater
+47 closet
+48 keyboard
+49 monitor
+50 telephone
+51 printer
+52 clock
+53 laptop
+54 fireplace
+55 plant
+56 kettle
+57 washer
+58 radiator
+59 suitcase
+60 blanket
+61 dishwasher
+62 power strip
+63 fan
+64 cutting board
+65 cup
+66 pan
+67 shoe
+68 crate
+69 bowl
+70 coat rack
+71 shoe rack
+72 headphones
+73 guitar
+74 piano
+75 bucket
+76 oven
+78 trash bin
+79 microwawe
+80 basket
+82 sink
+83 cushion
+
+14->7 desk->table
+25->25 television->tv
+37->77 bag->paper bag
+8 -> 81 door -> doorframe

@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual Environment
+venv/
+env/
+ENV/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Data
+data/*.jpg
+data/*.png
+data/*.mp4
+data/*.ply
+data/*.pcd
+*.npy
+*.npz
+
+# Output
+output/
+results/
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Config (可选：如果包含敏感信息)
+# config/local_config.yaml

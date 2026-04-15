@@ -1,0 +1,179 @@
+data:
+  # SpatialEvo training JSONL plus ScanNet validation.
+  train_files: ./dataset/spatialevo_train.jsonl
+  val_files: ./dataset/scannet_val_multi_frame.jsonl
+
+  prompt_key: problem # nullable
+  answer_key: answer # nullable
+  image_key: images
+  video_key: videos
+
+  # Optional base directory for media paths.
+  image_dir: null
+
+  video_fps: 2.0
+
+  max_prompt_length: 60000 # tokens
+  max_response_length: 2048 # tokens
+
+  # Total prompts per rollout step.
+  rollout_batch_size: 8
+
+  # Generation micro-batch size.
+  mini_rollout_batch_size: 8
+
+  val_batch_size: 8
+
+  # Use the model default chat template when null.
+  override_chat_template: null
+
+  shuffle: true
+  seed: 42
+
+  min_pixels: 100352
+  max_pixels: 150528
+
+  # Keep overlong prompts instead of dropping them.
+  filter_overlong_prompts: false
+
+algorithm:
+  # Use GRPO without a critic.
+  adv_estimator: grpo
+
+  # Enable the two-round training pipeline.
+  two_round_training: true
+
+  # KL settings.
+  disable_kl: false
+  use_kl_loss: true
+  kl_penalty: low_var_kl
+  kl_coef: 1.0e-2
+
+  # Optional online reward filtering.
+  online_filtering: false
+  filter_key: overall
+  filter_low: 0.01
+  filter_high: 0.99
+
+worker:
+  actor:
+    global_batch_size: 8
+    micro_batch_size_per_device_for_update: 1
+    micro_batch_size_per_device_for_experience: 1
+    max_grad_norm: 1.0
+    padding_free: true
+    dynamic_batching: true
+
+    # Ulysses sequence parallel size.
+    ulysses_size: 1
+
+    model:
+      # Qwen-VL checkpoint.
+      model_path: Qwen2.5-VL-3B-Instruct
+      enable_gradient_checkpointing: true
+      trust_remote_code: true
+      freeze_vision_tower: false
+
+    optim:
+      lr: 1.0e-6
+      weight_decay: 1.0e-2
+      strategy: adamw
+      lr_warmup_ratio: 0.0
+
+    fsdp:
+      enable_full_shard: true
+      enable_cpu_offload: false
+      enable_rank0_init: true
+      torch_dtype: bf16
+
+    offload:
+      offload_params: true
+      offload_optimizer: true
+
+  rollout:
+    # Samples generated per prompt.
+    n: 4
+
+    temperature: 1.0
+
+    # Max tokens per vLLM batch.
+    max_num_batched_tokens: 300000
+
+    # Top-p sampling threshold.
+    top_p: 1.0
+
+    # Per-prompt image cap; helps avoid OOM.
+    limit_images: 16
+
+    # vLLM runtime settings.
+    gpu_memory_utilization: 0.6 # 0.6
+    enforce_eager: True # false
+    enable_chunked_prefill: false
+    tensor_parallel_size: 2
+    disable_tqdm: false
+
+    val_override_config:
+      temperature: 0.6
+      top_p: 0.95
+      n: 1
+
+  ref:
+    fsdp:
+      enable_full_shard: true
+      enable_cpu_offload: true
+      enable_rank0_init: true
+      torch_dtype: bf16
+
+    offload:
+      offload_params: false
+
+  reward:
+    reward_function: ./training/reward_function/unified_reward.py:compute_score
+
+    # Extra kwargs for the reward function.
+    reward_function_kwargs:
+      question_quality_kwargs:
+        model: "<LLM_MODEL_NAME>"
+        api_key: "<YOUR_API_KEY>"
+        service_url: "<YOUR_OPENAI_COMPATIBLE_BASE_URL>"
+        timeout: 30
+
+      majority_correctness_kwargs:
+        model: "<LLM_MODEL_NAME>"
+        api_key: "<YOUR_API_KEY>"
+        service_url: "<YOUR_OPENAI_COMPATIBLE_BASE_URL>"
+        timeout: 30
+      
+    # Skip tokenizer special tokens when decoding.
+    skip_special_tokens: true
+
+    # CPU workers for the reward function.
+    num_cpus: 1
+
+trainer:
+  total_epochs: 4
+  max_steps: null
+
+  project_name: SpatialEvo
+  experiment_name: spatialevo_0416
+
+  logger: ["file"]
+
+  nnodes: 1
+  n_gpus_per_node: 8
+
+  max_try_make_batch: 30
+  world_simulator_max_workers: 16
+
+  val_freq: -1
+  val_before_train: false
+  val_only: false
+  val_generations_to_log: 5
+
+  save_freq: 100
+  save_limit: 20
+  save_model_only: false
+
+  save_checkpoint_path: ./checkpoints/spatialevo
+  load_checkpoint_path: null
+  find_last_checkpoint: true

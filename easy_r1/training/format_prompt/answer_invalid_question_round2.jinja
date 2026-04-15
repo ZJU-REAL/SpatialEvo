@@ -1,0 +1,23 @@
+You are an expert spatial reasoning analyst.
+
+The following question has already been judged invalid for the assigned task. Your job is to explain why it is invalid based on the task validity rules below.
+
+Assigned task type: `{{ task_display_name }}` (`{{ task_type }}`)
+
+Question:
+{{ question }}
+
+{{ task_reference_text }}
+
+Explain step by step why this question is invalid. Each step should be grounded in the task validity rules and the simulator-backed diagnostic context. Avoid redundant or repetitive descriptions.
+
+Focus on the main issue in the question itself, such as:
+- using object labels outside the allowed grounded pool,
+- using an object that is ambiguous or not uniquely grounded,
+- using the wrong number of candidates or roles for this task,
+- reusing the same object in conflicting roles,
+- or asking in a way that does not match the assigned task schema.
+
+After your reasoning, provide the final conclusion inside `<answer>` tags, for example: `<answer>The target object is not uniquely grounded.</answer>`.
+
+Response:

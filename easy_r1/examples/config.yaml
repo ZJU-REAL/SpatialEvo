@@ -1,0 +1,239 @@
+# Data
+
+data:
+
+  # Hugging Face dataset spec: `repo@split`.
+  train_files: hiyouga/math12k@train
+
+  # Validation split in the same format.
+  val_files: hiyouga/math12k@test
+
+  prompt_key: problem
+  answer_key: answer
+  image_key: images
+  video_key: videos
+
+  # Optional base directory for media paths.
+  image_dir: null
+
+  video_fps: 2.0
+
+  max_prompt_length: 2048 # tokens
+  max_response_length: 2048 # tokens
+
+  # Rollout batch size; maps to `verl.data.train_batch_size`.
+  rollout_batch_size: 512
+
+  # Optional generation micro-batch; `null` lets verl choose.
+  mini_rollout_batch_size: null
+
+  val_batch_size: 1024
+
+  # Jinja template used to format prompts.
+  format_prompt: ./examples/format_prompt/math.jinja
+
+  # Use the model default chat template when null.
+  override_chat_template: null
+
+  shuffle: true
+  seed: 1
+
+  min_pixels: 262144 # 512x512
+  max_pixels: 4194304 # 2048x2048
+
+  # Drop samples whose prompt exceeds `max_prompt_length`.
+  filter_overlong_prompts: true
+
+# Algorithm
+algorithm:
+  # Advantage estimator: gae, grpo, rloo, remax, reinforce_plus_plus.
+  adv_estimator: grpo
+
+  # Disable KL handling entirely.
+  disable_kl: false
+
+  # Add KL loss to actor updates.
+  use_kl_loss: true
+
+  # KL penalty mode when KL is not used as a direct loss term.
+  kl_penalty: low_var_kl
+
+  # KL coefficient.
+  kl_coef: 1.0e-2
+
+  # Keep only samples whose reward falls in the configured range.
+  online_filtering: false
+
+  # Reward field used for filtering.
+  filter_key: overall
+
+  # Inclusive reward filter range.
+  filter_low: 0.01
+  filter_high: 0.99
+
+# Workers
+worker:
+  # Actor
+  actor:
+
+    # PPO mini-batch size.
+    global_batch_size: 128
+
+    # Per-device micro-batch for gradient updates.
+    micro_batch_size_per_device_for_update: 1
+
+    # Per-device micro-batch for rollout log-prob evaluation.
+    micro_batch_size_per_device_for_experience: 2
+
+    max_grad_norm: 1.0
+
+    # Enable padding-free packing.
+    padding_free: true
+
+    # Enable token-count-based dynamic batching.
+    dynamic_batching: true
+
+    # Ulysses sequence parallel size.
+    ulysses_size: 1
+
+    model:
+      # Hugging Face model name or path.
+      model_path: Qwen/Qwen2.5-7B-Instruct
+
+      # Save memory by recomputing activations.
+      enable_gradient_checkpointing: true
+
+      trust_remote_code: false
+
+      # Keep the vision tower trainable.
+      freeze_vision_tower: false
+
+    optim:
+
+      lr: 1.0e-6
+
+      # Weight decay.
+      weight_decay: 1.0e-2
+
+      # Optimizer backend.
+      strategy: adamw
+
+      # Fraction of training used for warmup.
+      lr_warmup_ratio: 0.0
+
+    # FSDP
+    fsdp:
+      # Use full parameter sharding.
+      enable_full_shard: true
+
+      # Offload sharded parameters to CPU.
+      enable_cpu_offload: false
+
+      # Initialize parameters on rank 0 first.
+      enable_rank0_init: true
+
+    # CPU offload
+    offload:
+      # Offload model parameters to CPU between steps.
+      offload_params: true
+
+      # Offload optimizer states to CPU.
+      offload_optimizer: true
+
+  # Rollout
+  rollout:
+
+    # Number of samples generated per prompt.
+    n: 5
+
+    # Sampling temperature.
+    temperature: 1.0
+
+    # Top-p sampling threshold.
+    top_p: 1.0
+
+    # Maximum images per prompt; `0` disables the limit.
+    limit_images: 0
+
+    # vLLM
+    gpu_memory_utilization: 0.6
+
+    # Force eager execution instead of CUDA graphs.
+    enforce_eager: false
+
+    # Enable vLLM chunked prefill.
+    enable_chunked_prefill: false
+
+    # Tensor parallel size.
+    tensor_parallel_size: 2
+
+    # Disable the progress bar.
+    disable_tqdm: false
+
+    val_override_config:
+      temperature: 0.6
+      top_p: 0.95
+      n: 1
+
+  # Reference policy for KL.
+  ref:
+    fsdp:
+      enable_full_shard: true
+      enable_cpu_offload: true
+      enable_rank0_init: true
+
+    offload:
+      offload_params: false
+
+  reward:
+    # Python entrypoint in `path:function` format.
+    reward_function: ./examples/reward_function/math.py:compute_score
+
+# Trainer
+trainer:
+
+  # Use `max_steps` when set; otherwise use `total_epochs`.
+  total_epochs: 15
+  max_steps: null
+
+  project_name: easy_r1 # wandb
+  experiment_name: qwen2_5_7b_math_grpo
+
+  # Supported loggers: `file`, `wandb`, `console`.
+  logger: ["file"]
+
+  nnodes: 1
+  n_gpus_per_node: 8 # GPUs
+
+  # Retries when batch construction fails.
+  max_try_make_batch: 20
+
+  # Validation frequency in steps; `-1` disables it.
+  val_freq: 5
+
+  # Run validation before training starts.
+  val_before_train: true
+
+  # Skip training and only run validation.
+  val_only: false
+
+  # Number of validation generations to log.
+  val_generations_to_log: 3
+
+  # Checkpoint save frequency in steps; `-1` disables it.
+  save_freq: 5
+
+  # Maximum number of checkpoints to keep; `-1` keeps all.
+  save_limit: 3
+
+  # Save only model weights instead of full trainer state.
+  save_model_only: false
+
+  # Checkpoint output directory; null uses `experiment_name`.
+  save_checkpoint_path: null
+
+  # Checkpoint to resume from.
+  load_checkpoint_path: null
+
+  # Auto-resume from the latest checkpoint when possible.
+  find_last_checkpoint: true

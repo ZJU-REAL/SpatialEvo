@@ -1,0 +1,290 @@
+{
+  "version": "1.0",
+  "description": "Task-conditioned Round1 question-generation specifications. The trainer selects a canonical task_type first, then renders one task-specific prompt from this file.",
+  "tasks": {
+    "object_counting": {
+      "task_group": "scene",
+      "display_name": "Object Counting",
+      "task_goal": "Ask for the total number of one present object category in the whole scene.",
+      "task_requirements": [
+        "Use one grounded object label that is actually present in the scene.",
+        "Do not ask about an absent category or any category whose answer would be 0.",
+        "Prefer a repeated label when possible, but a clearly grounded single-instance category is still allowed.",
+        "Ask about the whole scene, not just one sampled view."
+      ],
+      "question_templates": [
+        "How many {object_label}s are in this room?",
+        "How many {object_label}s are in the whole scene?"
+      ],
+      "example_observation": "Across the whole room, larger furniture shapes the perimeter while object1 appears in multiple parts of the layout, and open floor space connects the center to the room boundary. Narrowing from this full-scene caption, object1 is the most suitable counting target because it is distributed across the scene rather than confined to one corner. Because object1 is grounded as `Non-Unique` in the scene list, this naturally leads to counting it over the whole room.",
+      "example_question": "How many object1 instances are in this room?"
+    },
+    "absolute_distance": {
+      "task_group": "scene",
+      "display_name": "Absolute Distance",
+      "task_goal": "Ask for the metric distance between two different unique objects in the scene.",
+      "task_requirements": [
+        "Choose two different labels marked (Unique) from the whole-scene object list.",
+        "Copy both labels exactly from the provided pool; do not add modifiers, locations, or descriptive suffixes.",
+        "Prefer isolated landmarks instead of tiny clutter or weakly grounded labels.",
+        "Name both object labels explicitly in the question.",
+        "Ask for the direct distance in meters."
+      ],
+      "question_templates": [
+        "Measuring from the closest point of each object, what is the direct distance between the {object_a} and the {object_b} (in meters)?",
+        "What is the direct distance between the {object_a} and the {object_b} in meters?"
+      ],
+      "example_observation": "The whole scene shows object1 and object2 positioned in different parts of the room, with clear floor space and other supporting structure around them. Narrowing from the overall room layout, object1 and object2 are the most suitable distance targets because they are distinct `Unique` objects with visible separation between them. This naturally leads to asking for their direct distance.",
+      "example_question": "Measuring from the closest point of each object, what is the direct distance between object1 and object2 (in meters)?"
+    },
+    "object_size": {
+      "task_group": "scene",
+      "display_name": "Object Size",
+      "task_goal": "Ask for the longest dimension of one unique object in the scene.",
+      "task_requirements": [
+        "Choose one label marked (Unique) from DETECTED_OBJECTS.",
+        "Ask about the longest dimension of that object.",
+        "Ask for the answer in centimeters."
+      ],
+      "question_templates": [
+        "What is the length of the longest dimension (length, width, or height) of the {object_label}, measured in centimeters?",
+        "What is the longest dimension of the {object_label} in centimeters?"
+      ],
+      "example_observation": "The scene contains object1 occupying a clear part of the layout, with supporting furniture nearby and open walking space around it. Narrowing from the full-room caption, object1 stands out as a well-bounded single target whose extent is easy to reason about. Because object1 is grounded as a `Unique` object in the list, this naturally leads to asking about its longest dimension.",
+      "example_question": "What is the length of the longest dimension (length, width, or height) of object1, measured in centimeters?"
+    },
+    "room_size": {
+      "task_group": "scene",
+      "display_name": "Room Size",
+      "task_goal": "Ask for the total room area of the scene.",
+      "task_requirements": [
+        "Ask only about the room or combined visible room area.",
+        "Use objects only to support room-boundary and open-floor reasoning; do not make any object the measurement target.",
+        "Ask for the answer in square meters.",
+        "Do not mention unrelated object-specific measurements."
+      ],
+      "question_templates": [
+        "What is the size of this room (in square meters)? If multiple rooms are shown, estimate the size of the combined space.",
+        "What is the total size of this room in square meters?"
+      ],
+      "example_observation": "The full scene shows furniture arranged around the room perimeter, with larger items hugging the walls and a continuous open walking region spanning the center. Narrowing from this overall caption, the useful signal is the enclosed floor footprint and the boundary implied by occupied edges versus open interior space, not any single object measurement. That scene-level layout naturally leads to asking for the total room area.",
+      "example_question": "What is the size of this room (in square meters)? If multiple rooms are shown, estimate the size of the combined space."
+    },
+    "relative_distance": {
+      "task_group": "scene",
+      "display_name": "Relative Distance",
+      "task_goal": "Ask which candidate object is closest to one unique anchor object in the scene.",
+      "task_requirements": [
+        "Choose one label marked (Unique) as the anchor object.",
+        "Prefer the three candidate object labels from other clear `Unique` labels when possible, and only fall back to other grounded scene labels if needed.",
+        "Choose three distinct candidate object labels from the scene.",
+        "Avoid candidate labels that are repeated or weakly localized when a clearer alternative exists.",
+        "Ask which candidate is closest to the anchor."
+      ],
+      "question_templates": [
+        "Measuring from the closest point of each object, which of these objects ({object_a}, {object_b}, {object_c}) is the closest to the {anchor_object}?",
+        "Which of these objects ({object_a}, {object_b}, {object_c}) is nearest to the {anchor_object}?"
+      ],
+      "example_observation": "Across the room, anchor_object serves as a clear unique anchor, while object1, object2, and object3 appear at noticeably different distances around it. Narrowing from the full-scene caption, anchor_object is well isolated and the candidates are all distinct enough to support a stable nearest-object comparison. This distance pattern naturally leads to asking which candidate is closest to anchor_object.",
+      "example_question": "Measuring from the closest point of each object, which of these objects (object1, object2, object3) is the closest to anchor_object?"
+    },
+    "relative_direction_hard": {
+      "task_group": "scene",
+      "display_name": "Relative Direction",
+      "task_goal": "Ask for the egocentric direction of one unique object from a reference frame defined by standing at one unique object and facing another unique object.",
+      "task_requirements": [
+        "Choose exactly three different labels marked (Unique): one standing-point object, one facing object, and one query object.",
+        "Copy all three labels exactly from the provided pool; do not add modifiers, attributes, room-side phrases, or descriptive suffixes.",
+        "Use only plain object labels. Do not write phrases such as chair on the left, table near the wall, photo on the bed, or right side of the room.",
+        "Write the question as one direct direction question in a single sentence.",
+        "Keep all three roles explicit in the question: the standing object, the facing object, and the query object must all be named.",
+        "Prefer three isolated, visually distinct landmarks that form a stable orientation frame; avoid clutter, repeated categories, or awkward triples.",
+        "Do not turn this task into yes/no, which-object, visibility, distance, or counting questions."
+      ],
+      "question_templates": [
+        "If I am standing by the {stand_object} and facing the {face_object}, where is the {query_object} located relative to me?",
+        "If you are standing at the {stand_object} and facing the {face_object}, where is the {query_object} located relative to you?"
+      ],
+      "example_observation": "In the overall room layout, object1, object2, and object3 are distinct landmarks occupying different parts of the scene rather than collapsing into the same local cluster. Narrowing from this full-scene caption, object1 is suitable as the standing point, object2 gives a stable facing direction, and object3 is a separate queried target inside the same grounded frame. Because all three labels are exact `Unique` scene labels and form a clean orientation triple, this naturally leads to asking for the direction of object3 when standing at object1 and facing object2.",
+      "example_question": "If I am standing by object1 and facing object2, where is object3 located relative to me?"
+    },
+    "single_image_relative_direction": {
+      "task_group": "single_image",
+      "display_name": "Single-Image Relative Direction",
+      "task_goal": "Ask where one visible object is relative to another visible object within the same image.",
+      "task_requirements": [
+        "Choose two visible object labels from the current image.",
+        "Prefer labels marked (Unique) in the image to avoid ambiguity.",
+        "Prefer two well-separated visible labels instead of an overlapping or weakly grounded pair.",
+        "Ask for the relative direction of the target object with respect to the reference object."
+      ],
+      "question_templates": [
+        "In this image, where is the {target_object} relative to the {reference_object}?",
+        "Looking at the current image, what is the direction of the {target_object} from the {reference_object}?"
+      ],
+      "example_observation": "In this single image, object1 and object2 occupy clearly different positions in the frame, while additional scene structure remains visible behind and around them. Narrowing from this overall image layout, object1 and object2 form the clearest directional pair because both are prominent, well-separated, and fully grounded in the visible foreground. Because they are suitable targets in this image, this naturally leads to asking where object1 is relative to object2.",
+      "example_question": "In this image, where is object1 relative to object2?"
+    },
+    "distance_cam_obj": {
+      "task_group": "single_image",
+      "display_name": "Distance (Camera-Object)",
+      "task_goal": "Ask for the metric distance from the camera to one visible object in the current image.",
+      "task_requirements": [
+        "Choose one visible object label from the current image.",
+        "Prefer a label marked (Unique) in the image.",
+        "Prefer one prominent and fully grounded target instead of a tiny or heavily occluded label.",
+        "Ask for the distance in meters."
+      ],
+      "question_templates": [
+        "What is the distance from the camera to the {object_label} in meters?",
+        "How far is the {object_label} from the camera in this image, in meters?"
+      ],
+      "example_observation": "This image shows object1 occupying a strong foreground position, with additional structure and other grounded content extending behind it. Narrowing from that broader image, object1 is the most prominent and fully grounded target directly in front of the camera rather than a tiny side object or partial label. Because it is a clear target in this image, this naturally leads to asking for its distance from the camera.",
+      "example_question": "What is the distance from the camera to object1 in meters?"
+    },
+    "depth_order_obj_obj": {
+      "task_group": "single_image",
+      "display_name": "Depth Order",
+      "task_goal": "Ask which of two visible objects is closer to the camera in the current image.",
+      "task_requirements": [
+        "Choose two distinct labels from the provided Unique visible object pool for this image.",
+        "Copy both labels exactly as shown; do not rewrite them into phrases such as partially visible chair or chair on the left.",
+        "The question should compare their depth relative to the camera.",
+        "Avoid pairs that appear at nearly the same depth or are too occluded to compare cleanly.",
+        "Allow the answer to be one object name or same if they are at the same depth."
+      ],
+      "question_templates": [
+        "Which object is closer to the camera, the {object_a} or the {object_b}?",
+        "Between the {object_a} and the {object_b}, which one is nearer to the camera?"
+      ],
+      "example_observation": "Within this frame, object1 and object2 occupy noticeably different depth layers, while other scene elements remain behind or around them, so the image provides a complete caption of the local depth layout. Narrowing from that full image, object1 and object2 are the clearest comparison targets because they are both grounded and not an almost-tied pair. This naturally leads to asking which one is closer to the camera.",
+      "example_question": "Between object1 and object2, which one is nearer to the camera?"
+    },
+    "position_cam_cam": {
+      "task_group": "image_pair",
+      "display_name": "Position (Camera-Camera)",
+      "task_goal": "Ask for the relative position between the two camera viewpoints, using either image as the explicit reference.",
+      "task_requirements": [
+        "Either image may be the reference camera, but the wording must explicitly name Image 1 or Image 2.",
+        "Do not ask about objects in this task.",
+        "Both question directions are valid: Image 1 -> Image 2 and Image 2 -> Image 1.",
+        "Ask for a short direction answer."
+      ],
+      "question_templates": [
+        "When you took Image 1, where was the camera for Image 2, relative to you?",
+        "When you took Image 2, where was the camera for Image 1, relative to you?"
+      ],
+      "example_observation": "Across the image pair, both views look at the same room region with overlapping objects and similar viewing direction, while the framing changes slightly between them and shared landmarks remain visible in both images. Narrowing from this pair-level caption, the main local difference is that Image 2 is captured from a viewpoint slightly farther forward and shifted to the right relative to Image 1. Because the two views have strong shared visibility and stable correspondence, this naturally leads to asking where the Image 2 camera is relative to the Image 1 camera.",
+      "example_question": "When you took Image 1, where was the camera for Image 2, relative to you?"
+    },
+    "elevation_cam_cam": {
+      "task_group": "image_pair",
+      "display_name": "Elevation (Camera-Camera)",
+      "task_goal": "Ask for the vertical relation between the two cameras when the pair has a real height difference.",
+      "task_requirements": [
+        "Either image may be the reference camera, but the wording must explicitly name Image 1 or Image 2.",
+        "Do not ask about horizontal movement here.",
+        "Only ask this task when the current pair has a noticeable vertical difference; same_level pairs are invalid.",
+        "Both question directions are valid: you may compare Image 2 against Image 1, or compare Image 1 against Image 2.",
+        "Keep the question aligned with the answer set: higher or lower."
+      ],
+      "question_templates": [
+        "Compared with the camera in Image 1, is the camera in Image 2 higher or lower?",
+        "Compared with the camera in Image 2, is the camera in Image 1 higher or lower?"
+      ],
+      "example_observation": "The two images cover the same room area with overlapping objects and similar horizontal viewpoint, and most of the visible layout stays aligned across the pair. Narrowing from that pair-level caption, the important difference is vertical: one view is clearly captured from a lower height while the other is higher, rather than staying at the same level. Because the pair preserves the same area while changing height, this naturally supports either phrasing: compare Image 2 against Image 1, or compare Image 1 against Image 2, as long as the wording is explicit.",
+      "example_question": "Compared with the camera in Image 1, is the camera in Image 2 higher or lower?"
+    },
+    "visibility_compare": {
+      "task_group": "image_pair",
+      "display_name": "Visibility Compare",
+      "task_goal": "Ask which image shows one target object more clearly or visibly.",
+      "task_requirements": [
+        "Choose one label from the provided non-ambiguous pair-grounded object pool.",
+        "Prefer a label whose visibility clearly changes between the two images.",
+        "Copy the label exactly as shown; do not output placeholders such as object1 or generic words such as object.",
+        "Write the question so the answer can be image1, image2, same, or neither.",
+        "Do not rely on one fixed answer-option order inside the question body."
+      ],
+      "question_templates": [
+        "For the {object_label}, which image shows it more clearly?",
+        "Considering the {object_label}, in which image is it more visible?"
+      ],
+      "example_observation": "Across the pair, both images capture the same room region, several labels are shared between views, and the broader room layout stays comparable from one image to the other. Narrowing from that pair-level caption, object1 is the most useful visibility target because it appears weaker or more occluded in one image but clearer in the other, creating a clean contrast. This naturally leads to asking which image shows object1 more clearly, while leaving the answer options to the later answer hint rather than hard-coding one fixed order in the question.",
+      "example_question": "For object1, which image shows it more clearly?"
+    },
+    "position_cam_obj": {
+      "task_group": "image_pair",
+      "display_name": "Position (Camera-Object)",
+      "task_goal": "Ask where one visible object is relative to the camera in Image 1 or Image 2.",
+      "task_requirements": [
+        "Choose exactly one image and mention it explicitly as Image 1 or Image 2.",
+        "Both Image 1 and Image 2 question forms are valid; do not always default to Image 1.",
+        "Choose one visible object label from that image.",
+        "Prefer labels marked (Unique) in the chosen image.",
+        "Prefer one prominent label in the chosen image instead of a tiny or weakly grounded target.",
+        "If one image gives a much cleaner grounded target than the other, prefer that image-specific question."
+      ],
+      "question_templates": [
+        "Which direction is the {object_label} relative to me when I am taking Image 1?",
+        "Which direction is the {object_label} relative to me when I am taking Image 2?"
+      ],
+      "example_observation": "Across the pair, the room structure and several shared scene elements remain visible in both images, giving a broader comparative caption before focusing on one view. Narrowing to Image 2, object1 occupies a clear localized position relative to that camera, with supporting spatial context around it that grounds its direction. Because object1 is prominent rather than a weak edge object, this naturally leads to asking where it is relative to the Image 2 camera rather than defaulting to Image 1 by habit.",
+      "example_question": "Which direction is object1 relative to me when I am taking Image 2?"
+    },
+    "position_cam_reg": {
+      "task_group": "image_pair",
+      "display_name": "Position (Camera-Region)",
+      "task_goal": "Ask where a concrete region or functional area is relative to the camera in Image 1 or Image 2.",
+      "task_requirements": [
+        "Choose exactly one image and mention it explicitly as Image 1 or Image 2.",
+        "Both Image 1 and Image 2 question forms are valid; do not always default to Image 1.",
+        "First choose one clear object anchor from the provided Unique-label pool for that image.",
+        "Convert that anchor into a short grounded region phrase such as desk area, bed area, sink area, or sofa area.",
+        "Use a short grounded region phrase such as desk area, bed area, sink area, or dining area.",
+        "Keep the region phrase visually grounded in the provided image pair.",
+        "If one image gives a cleaner anchor for a localized region, prefer that image-specific question."
+      ],
+      "question_templates": [
+        "When you are taking Image 1, in which direction is the {region_name} relative to you?",
+        "When you are taking Image 2, in which direction is the {region_name} relative to you?"
+      ],
+      "example_observation": "The image pair shows the same room from nearby viewpoints, with shared structure and overlapping content giving a broader comparative caption across both images. Narrowing to Image 2, object1 defines the clearest localized part of the scene, with enough surrounding spatial context to convert that anchor into region1. Region1 is visually localized relative to the chosen camera, which naturally leads to asking where region1 is relative to that camera.",
+      "example_question": "When you are taking Image 2, in which direction is region1 relative to you?"
+    },
+    "motion_camera": {
+      "task_group": "image_pair",
+      "display_name": "Camera Motion",
+      "task_goal": "Ask for the camera motion from Image 1 to Image 2.",
+      "task_requirements": [
+        "Use Image 1 as the starting camera and Image 2 as the ending camera.",
+        "Do not ask about object positions here.",
+        "Ask for a concise motion direction label."
+      ],
+      "question_templates": [
+        "Based on the continuous images, in which direction is the camera rotating?",
+        "Based on the continuous images, what is the camera motion direction?"
+      ],
+      "example_observation": "Comparing the two images, both views observe the same room region, overlapping objects stay visible across the pair, and the general viewing direction remains similar, giving a stable pair-level caption. Narrowing from that broader comparison, the framing changes show that the Image 2 viewpoint is farther forward and slightly to the left relative to Image 1. Because this local change is best explained as camera displacement across otherwise shared content, this naturally leads to asking for the motion direction from Image 1 to Image 2.",
+      "example_question": "Based on the continuous images, in which direction is the camera rotating?"
+    },
+    "attribute_measurement": {
+      "task_group": "image_pair",
+      "display_name": "Attribute Measurement",
+      "task_goal": "Ask which of two objects has the larger longest dimension.",
+      "task_requirements": [
+        "Choose two different object labels from the provided non-ambiguous pair-grounded pool.",
+        "Each object may come from Image 1 or Image 2; the two objects do not need to come from the same image.",
+        "Copy both labels exactly as shown; do not invent object names that are outside the provided pool.",
+        "Prefer two rigid, clearly identifiable objects with a meaningful size contrast.",
+        "Ask which object has the larger longest dimension."
+      ],
+      "question_templates": [
+        "Between the {object_a} and the {object_b}, which one has the larger longest dimension?",
+        "Which object is larger in its longest dimension, the {object_a} or the {object_b}?"
+      ],
+      "example_observation": "Across the image pair, multiple shared scene elements are visible and object1 plus object2 are clearly identifiable within the broader room context, giving a complete comparative caption before focusing on one property. Narrowing from that full pair description, object1 and object2 show a meaningful size contrast while remaining rigid and grounded comparison targets. This naturally leads to asking which one is larger in its longest dimension.",
+      "example_question": "Between object1 and object2, which one has the larger longest dimension?"
+    }
+  }
+}

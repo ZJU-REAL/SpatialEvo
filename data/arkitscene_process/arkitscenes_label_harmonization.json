@@ -1,0 +1,177 @@
+{
+    "default": {
+        "label_family": "object",
+        "scannet_ref_label": "object",
+        "scannet_ref_id": -1,
+        "nyu40class": "object",
+        "nyu40id": -1,
+        "mpcat40": "object"
+    },
+    "labels": {
+        "bathtub": {
+            "label": "bathtub",
+            "label_family": "bathroom_fixture",
+            "scannet_ref_label": "bathtub",
+            "scannet_ref_id": 42,
+            "nyu40class": "bathtub",
+            "nyu40id": 36,
+            "mpcat40": "bathtub",
+            "aliases": ["tub"]
+        },
+        "bed": {
+            "label": "bed",
+            "label_family": "sleeping_furniture",
+            "scannet_ref_label": "bed",
+            "scannet_ref_id": 11,
+            "nyu40class": "bed",
+            "nyu40id": 4,
+            "mpcat40": "bed"
+        },
+        "cabinet": {
+            "label": "cabinet",
+            "label_family": "storage_furniture",
+            "scannet_ref_label": "cabinet",
+            "scannet_ref_id": 7,
+            "nyu40class": "cabinet",
+            "nyu40id": 3,
+            "mpcat40": "cabinet",
+            "aliases": ["kitchen cabinet", "storage cabinet"]
+        },
+        "chair": {
+            "label": "chair",
+            "label_family": "seating",
+            "scannet_ref_label": "chair",
+            "scannet_ref_id": 2,
+            "nyu40class": "chair",
+            "nyu40id": 5,
+            "mpcat40": "chair",
+            "aliases": ["office chair", "armchair"]
+        },
+        "dishwasher": {
+            "label": "dishwasher",
+            "label_family": "kitchen_appliance",
+            "scannet_ref_label": "dishwasher",
+            "scannet_ref_id": 136,
+            "nyu40class": "dishwasher",
+            "nyu40id": 61,
+            "mpcat40": "appliances"
+        },
+        "fireplace": {
+            "label": "fireplace",
+            "label_family": "architectural_feature",
+            "scannet_ref_label": "fireplace",
+            "scannet_ref_id": 156,
+            "nyu40class": "fireplace",
+            "nyu40id": 54,
+            "mpcat40": "fireplace"
+        },
+        "oven": {
+            "label": "oven",
+            "label_family": "kitchen_appliance",
+            "scannet_ref_label": "oven",
+            "scannet_ref_id": 84,
+            "nyu40class": "oven",
+            "nyu40id": 76,
+            "mpcat40": "appliances"
+        },
+        "refrigerator": {
+            "label": "refrigerator",
+            "label_family": "kitchen_appliance",
+            "scannet_ref_label": "refrigerator",
+            "scannet_ref_id": 27,
+            "nyu40class": "refridgerator",
+            "nyu40id": 24,
+            "mpcat40": "appliances",
+            "aliases": ["fridge", "refridgerator"]
+        },
+        "shelf": {
+            "label": "shelf",
+            "label_family": "storage_furniture",
+            "scannet_ref_label": "shelf",
+            "scannet_ref_id": 8,
+            "nyu40class": "shelves",
+            "nyu40id": 15,
+            "mpcat40": "shelving",
+            "aliases": ["bookshelf", "bookcase", "shelves"]
+        },
+        "sink": {
+            "label": "sink",
+            "label_family": "plumbing_fixture",
+            "scannet_ref_label": "sink",
+            "scannet_ref_id": 14,
+            "nyu40class": "sink",
+            "nyu40id": 82,
+            "mpcat40": "sink"
+        },
+        "sofa": {
+            "label": "sofa",
+            "label_family": "seating",
+            "scannet_ref_label": "sofa",
+            "scannet_ref_id": 1313,
+            "nyu40class": "sofa",
+            "nyu40id": 6,
+            "mpcat40": "sofa",
+            "aliases": ["couch"]
+        },
+        "stool": {
+            "label": "stool",
+            "label_family": "seating",
+            "scannet_ref_label": "stool",
+            "scannet_ref_id": 38,
+            "nyu40class": "otherprop",
+            "nyu40id": 40,
+            "mpcat40": "stool",
+            "aliases": ["ottoman", "footrest"]
+        },
+        "stove": {
+            "label": "stove",
+            "label_family": "kitchen_appliance",
+            "scannet_ref_label": "stove",
+            "scannet_ref_id": 62,
+            "nyu40class": "otherstructure",
+            "nyu40id": 38,
+            "mpcat40": "appliances",
+            "aliases": ["stovetop", "cooktop", "range"]
+        },
+        "table": {
+            "label": "table",
+            "label_family": "surface_furniture",
+            "scannet_ref_label": "table",
+            "scannet_ref_id": 4,
+            "nyu40class": "table",
+            "nyu40id": 7,
+            "mpcat40": "table",
+            "aliases": ["desk", "coffee table", "dining table"]
+        },
+        "toilet": {
+            "label": "toilet",
+            "label_family": "plumbing_fixture",
+            "scannet_ref_label": "toilet",
+            "scannet_ref_id": 17,
+            "nyu40class": "toilet",
+            "nyu40id": 33,
+            "mpcat40": "toilet",
+            "aliases": ["urinal"]
+        },
+        "tv_monitor": {
+            "label": "tv",
+            "label_family": "electronics",
+            "scannet_ref_label": "tv",
+            "scannet_ref_id": 33,
+            "nyu40class": "tv",
+            "nyu40id": 25,
+            "mpcat40": "tv_monitor",
+            "aliases": ["tv", "tv monitor", "monitor", "display"]
+        },
+        "washer": {
+            "label": "washing_machine",
+            "label_family": "laundry_appliance",
+            "scannet_ref_label": "washing machine",
+            "scannet_ref_id": 70,
+            "nyu40class": "washer",
+            "nyu40id": 57,
+            "mpcat40": "appliances",
+            "aliases": ["washing machine", "washing_machine"]
+        }
+    }
+}

@@ -1,0 +1,41 @@
+# Rubric and tool runtime config.
+# The world simulator reads:
+#   tools.vlm_tool.{model, vision_model, api_key, base_url, max_retries, temperature,
+#                   extraction_temperature, max_tokens, timeout, extraction_use_vision}
+#   tools.invalid_recovery_tool.{model, vision_model, api_key, base_url, timeout,
+#                                max_retries, temperature, max_tokens, max_scene_images,
+#                                attach_scene_bev, attach_bbox_overlay}
+
+tools:
+  vlm_tool:
+    # LLM for text extraction and rule checks.
+    model: "gpt-oss-120b-ldm"
+    # VLM for image understanding.
+    vision_model: "qwen3vl-8b"
+    # OpenAI-compatible backend settings.
+    api_key: ""
+    base_url: "https://example.com/v1"
+    max_retries: 20
+    temperature: 0.1
+    # Keep extraction deterministic for stable structured output.
+    extraction_temperature: 0.0
+    max_tokens: 20480
+    timeout: 60
+    # Disable vision for question extraction by default.
+    extraction_use_vision: false
+  invalid_recovery_tool:
+    # Run invalid recovery once with the same backend by default.
+    # Leave blank to inherit vlm_tool settings.
+    model: null
+    vision_model: null
+    api_key: null
+    base_url: null
+    timeout: 60
+    max_retries: 20
+    temperature: 0.0
+    max_tokens: 512
+    # Use 0 to attach all scene images.
+    max_scene_images: 0
+    # Enable extra evidence views by default.
+    attach_scene_bev: true
+    attach_bbox_overlay: true

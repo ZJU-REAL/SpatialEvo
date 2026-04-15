@@ -1,0 +1,205 @@
+# Runtime task config.
+#
+# Goals:
+# - Make task difficulty configurable instead of hard-coded.
+# - Keep compatibility with legacy fields:
+#   generation_difficulty_score / question_difficulty_score.
+# - Support new difficulty modes:
+#   - generation.mode: fixed | task_default
+#   - question.mode: fixed | answer_in_set | task_default
+
+scoring:
+  # Final confidence = base - LLM extraction penalty - issue penalty.
+  base_confidence: 1.0
+  llm_extraction_penalty: 0.05
+  min_confidence: 0.2
+
+constraints:
+  # Global visibility floor.
+  visibility_floor: 0.1
+
+invalid_recovery:
+  # Used only when WorldSimulator(enable_invalid_recovery=True).
+  # Max compressed scene-object lines in the recovery prompt.
+  max_scene_object_lines: 60
+  # Max visible-object lines for single/pair frames in the recovery prompt.
+  max_frame_object_lines: 25
+
+label_inventory:
+  # Merge small vocabularies into fuzzy matching.
+  # Use large open vocabularies as exact-only to avoid false matches.
+  enabled: true
+  fuzzy_sources:
+    - /mnt/jfs/lidingm/project/SpatialEvo/data/arkitscene_process/data_scripts/arkitscenes_object_names.json
+  exact_only_sources:
+    - /mnt/jfs/lidingm/project/SpatialEvo/data/scannetpp_process/scannetpp_metadata_object_names.json
+
+tasks:
+  object_counting:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.7
+      question:
+        # Lower question difficulty when the answer is in this set.
+        mode: answer_in_set
+        answer_parser: int_first_token
+        values: [0, 1]
+        hit_value: 0.5
+        miss_value: 1.0
+
+  object_size:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 1.0
+      question:
+        mode: fixed
+        value: 1.0
+
+  distance_cam_obj:
+    enabled: true
+    min_visibility: 0.1
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.82
+      question:
+        mode: fixed
+        value: 0.86
+
+  absolute_distance:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 1.0
+      question:
+        mode: fixed
+        value: 1.0
+
+  relative_distance:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 1.0
+      question:
+        mode: fixed
+        value: 1.0
+
+  depth_order_obj_obj:
+    enabled: true
+    min_visibility: 0.1
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.78
+      question:
+        mode: fixed
+        value: 0.83
+
+  relative_direction_hard:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 1.0
+      question:
+        mode: fixed
+        value: 1.0
+
+  single_image_relative_direction:
+    enabled: true
+    # Task visibility threshold, capped by constraints.visibility_floor.
+    min_visibility: 0.1
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.8
+      question:
+        mode: fixed
+        value: 1.0
+
+  room_size:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.6
+      question:
+        mode: fixed
+        value: 1.0
+
+  position_cam_cam:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.9
+      question:
+        mode: fixed
+        value: 0.9
+
+  elevation_cam_cam:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.62
+      question:
+        mode: fixed
+        value: 0.72
+
+  visibility_compare:
+    enabled: true
+    min_visibility: 0.1
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.8
+      question:
+        mode: fixed
+        value: 0.82
+
+  position_cam_obj:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.8
+      question:
+        mode: fixed
+        value: 0.9
+
+  position_cam_reg:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.75
+      question:
+        mode: fixed
+        value: 0.9
+
+  motion_camera:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.9
+      question:
+        mode: fixed
+        value: 0.8
+
+  attribute_measurement:
+    enabled: true
+    difficulty:
+      generation:
+        mode: fixed
+        value: 0.8
+      question:
+        mode: fixed
+        value: 0.9
