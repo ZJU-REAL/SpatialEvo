@@ -7,7 +7,7 @@ SpatialEvo: Self-Evolving Spatial Intelligence via Deterministic Geometric Envir
 _A self-evolving framework for 3D spatial reasoning with deterministic geometric feedback_
 
 <p align="center">
-  <a href="<PAPER_LINK>" target="_blank">
+  <a href="https://arxiv.org/abs/2604.14144" target="_blank">
     <img alt="Paper" src="https://img.shields.io/badge/arXiv-SpatialEvo-red?logo=arxiv" height="20" />
   </a>
   <a href="https://huggingface.co/lidingm/SpatialEvo-3B" target="_blank">
@@ -171,5 +171,13 @@ Our training framework is built upon **[MS-Swift](https://github.com/modelscope/
 If you find SpatialEvo useful, please consider citing our work:
 
 ```bibtex
-
+@misc{li2026spatialevoselfevolvingspatialintelligence,
+      title={SpatialEvo: Self-Evolving Spatial Intelligence via Deterministic Geometric Environments}, 
+      author={Dinging Li and Yingxiu Zhao and Xinrui Cheng and Kangheng Lin and Hongbo Peng and Hongxing Li and Zixuan Wang and Yuhong Dai and Haodong Li and Jia Wang and Yukang Shi and Liang Zhao and Jianjian Sun and Zheng Ge and Xiangyu Zhang and Weiming Lu and Jun Xiao and Yueting Zhuang and Yongliang Shen},
+      year={2026},
+      eprint={2604.14144},
+      archivePrefix={arXiv},
+      primaryClass={cs.CV},
+      url={https://arxiv.org/abs/2604.14144}, 
+}
 ```
